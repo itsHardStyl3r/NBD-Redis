@@ -2,7 +2,7 @@ package me.hardstyl3r.nbd;
 
 import me.hardstyl3r.nbd.objects.Product;
 import me.hardstyl3r.nbd.repositories.ProductCacheRepository;
-import me.hardstyl3r.nbd.repositories.ProductRepository;
+import me.hardstyl3r.nbd.repositories.ProductMongoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 class MockRedisProductCacheTest {
 
     @Mock
-    private ProductRepository productRepository;
+    private ProductMongoRepository mongoRepository;
 
     @Mock
     private JedisPool jedisPool;
@@ -42,7 +42,7 @@ class MockRedisProductCacheTest {
         assertNotNull(result);
         assertEquals("Test", result.name());
 
-        verify(productRepository, never()).findById(any());
+        verify(mongoRepository, never()).findById(any());
     }
 
     @Test
@@ -52,12 +52,12 @@ class MockRedisProductCacheTest {
 
         when(jedisPool.getResource()).thenReturn(jedis);
         when(jedis.get("product:200")).thenReturn(null);
-        when(productRepository.findById(id)).thenReturn(dbProduct);
+        when(mongoRepository.findById(id)).thenReturn(dbProduct);
 
         Product result = repository.findById(id);
         assertEquals("DbProduct", result.name());
 
-        verify(productRepository).findById(id);
+        verify(mongoRepository).findById(id);
         verify(jedis).setex(eq("product:200"), eq(3600L), contains("DbProduct"));
     }
 
@@ -67,13 +67,13 @@ class MockRedisProductCacheTest {
         Product dbProduct = new Product(id, "Survivor", 30.0, "Opis");
 
         when(jedisPool.getResource()).thenThrow(new RuntimeException("Connection refused"));
-        when(productRepository.findById(id)).thenReturn(dbProduct);
+        when(mongoRepository.findById(id)).thenReturn(dbProduct);
 
         Product result = repository.findById(id);
         assertNotNull(result);
         assertEquals("Survivor", result.name());
 
-        verify(productRepository).findById(id);
+        verify(mongoRepository).findById(id);
     }
 
     @Test
@@ -83,7 +83,7 @@ class MockRedisProductCacheTest {
 
         repository.save(newProduct);
 
-        verify(productRepository).save(newProduct);
+        verify(mongoRepository).save(newProduct);
         verify(jedis).del("product:400");
     }
 }

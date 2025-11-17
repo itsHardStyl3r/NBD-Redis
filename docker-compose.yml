@@ -1,0 +1,13 @@
+services:
+  mongodb:
+    image: mongo:8.2.1
+    container_name: mongodb_nbd_redis
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: nbd_db
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
