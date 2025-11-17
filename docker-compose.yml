@@ -9,5 +9,15 @@ services:
     volumes:
       - mongo-data:/data/db
 
+  redis:
+    image: redis:8.2.3
+    container_name: redis_nbd
+    restart: always
+    ports:
+      - "6379:6379"
+    # volumes:
+    #   - redis_data:/data
+
 volumes:
   mongo-data:
+  # redis-data:
