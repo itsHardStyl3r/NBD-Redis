@@ -4,6 +4,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import me.hardstyl3r.nbd.ConfigLoader;
 import me.hardstyl3r.nbd.objects.Product;
 import org.bson.Document;
 
@@ -15,7 +16,7 @@ public class ProductMongoRepository implements ProductRepository {
     private final MongoCollection<Document> collection;
 
     public ProductMongoRepository(MongoDatabase database) {
-        this.collection = database.getCollection("products");
+        this.collection = database.getCollection(ConfigLoader.getProperty("mongo.collection.test"));
     }
 
     @Override

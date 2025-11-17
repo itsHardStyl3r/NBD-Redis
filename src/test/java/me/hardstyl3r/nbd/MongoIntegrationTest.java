@@ -29,7 +29,7 @@ class MongoIntegrationTest {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             database.runCommand(new Document("ping", 1));
             repository = new ProductMongoRepository(database);
-            database.getCollection("products").drop();
+            database.getCollection(ConfigLoader.getProperty("mongo.collection.test")).drop();
         } catch (Exception e) {
             assumeTrue(false, "Could not connect to MongoDB (is Docker even running?).");
         }

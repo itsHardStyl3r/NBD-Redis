@@ -35,7 +35,7 @@ public class RedisBenchmark {
     @Setup(Level.Trial)
     public void setup() {
         mongoClient = MongoClients.create("mongodb://localhost:27017");
-        MongoDatabase db = mongoClient.getDatabase("benchmark_db");
+        MongoDatabase db = mongoClient.getDatabase(ConfigLoader.getProperty("mongo.collection.benchmark"));
 
         mongoRepository = new ProductMongoRepository(db);
         jedisPool = new JedisPool("localhost", 6379);

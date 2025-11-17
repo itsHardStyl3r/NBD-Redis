@@ -26,11 +26,16 @@ class FullIntegrationTest {
     @BeforeAll
     void setup() {
         try {
-            mongoClient = MongoClients.create("mongodb://localhost:27017");
-            mongoDatabase = mongoClient.getDatabase("nbd_db");
+            String mongoUri = ConfigLoader.getProperty("mongo.uri");
+            String mongoDbName = ConfigLoader.getProperty("mongo.db");
+            String redisHost = ConfigLoader.getProperty("redis.host");
+            int redisPort = ConfigLoader.getIntProperty("redis.port", 6379);
+
+            mongoClient = MongoClients.create(mongoUri);
+            mongoDatabase = mongoClient.getDatabase(mongoDbName);
 
             mongoDatabase.runCommand(new org.bson.Document("ping", 1));
-            jedisPool = new JedisPool("localhost", 6379);
+            jedisPool = new JedisPool(redisHost, redisPort);
             try (Jedis jedis = jedisPool.getResource()) {
                 if (!"PONG".equals(jedis.ping())) throw new RuntimeException("Redis dead");
             }
@@ -44,7 +49,7 @@ class FullIntegrationTest {
 
     @BeforeEach
     void cleanUp() {
-        mongoDatabase.getCollection("products").drop();
+        mongoDatabase.getCollection(ConfigLoader.getProperty("mongo.collection.test")).drop();
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.flushAll();
         }
