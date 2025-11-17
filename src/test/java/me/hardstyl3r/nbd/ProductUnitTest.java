@@ -71,4 +71,14 @@ class ProductUnitTest {
             ProductMapper.toProduct(brokenDoc);
         });
     }
+
+    @Test
+    void shouldThrowNPEWhenDocumentHasMissingPriceField() {
+        Document brokenDoc = new Document()
+                .append("_id", "broken-1")
+                .append("name", "Ghost");
+        assertThrows(NullPointerException.class, () -> {
+            ProductMapper.toProduct(brokenDoc);
+        });
+    }
 }
