@@ -44,7 +44,7 @@ class FullIntegrationTest {
 
     @BeforeEach
     void cleanUp() {
-        mongoDatabase.getCollection("test_products").drop();
+        mongoDatabase.getCollection("products").drop();
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.flushAll();
         }
