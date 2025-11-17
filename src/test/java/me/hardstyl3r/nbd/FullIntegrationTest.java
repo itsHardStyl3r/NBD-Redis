@@ -104,4 +104,24 @@ class FullIntegrationTest {
         assertNotNull(result);
         assertEquals("Szybki Cache", result.name());
     }
+
+    @Test
+    void shouldDeleteFromMongoAndInvalidateCache() {
+        String id = "prod-to-delete";
+        Product product = new Product(id, "Produkt do usunięcia", 10.0, "Opis");
+
+        redisRepository.save(product);
+        redisRepository.findById(id);
+
+        try (Jedis jedis = jedisPool.getResource()) {
+            assertTrue(jedis.exists("product:" + id), "Produkt powinien być w cache przed usunięciem");
+        }
+
+        redisRepository.delete(id);
+
+        assertNull(mongoRepository.findById(id), "Produkt powinien zostać usunięty z MongoDB");
+        try (Jedis jedis = jedisPool.getResource()) {
+            assertFalse(jedis.exists("product:" + id), "Cache dla produktu powinien zostać unieważniony");
+        }
+    }
 }
